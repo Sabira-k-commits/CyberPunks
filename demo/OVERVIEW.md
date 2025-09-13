@@ -5,12 +5,14 @@
 ## 🎯 Project Name
 ``` c
 // TODO: Enter your project name here
+CyberPunk
 ```
 
 ## 🚀 Summary
 ``` c
 // TODO: Write a short, high-level description of your
 // project (2–3 sentences).
+A market place for students to buy and sell things. Our webapp verifies users by sending them a one-time-pin(OTP) via email, and protects them from getting scammed.
 ```
 
 ## ✨ Key Features
