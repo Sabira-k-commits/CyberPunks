@@ -9,10 +9,12 @@ Our app is a platform that allows students to **buy and sell textbooks safely an
 - **User Verification:** Admin approval is required before users can start buying or selling.  
 - **Multi-Factor Authentication (MFA):** Added security layer ensures that only authorized users can access their accounts.  
 - **Account Status Management:** Admins can set user accounts as active, inactive, or suspended to maintain platform integrity.  
+- **Activity Monitoring:** Admins can view detailed logs of user actions, including login times, logouts, and account changes, allowing for proper auditing and oversight.  
+- **Brute Force Protection:** The system uses **rate limiting** and login attempt tracking to prevent unauthorized access through repeated login attempts. Accounts are temporarily locked after multiple failed logins to mitigate brute-force attacks.  
 - **Email Notifications:** Users receive email updates about verification, account changes, approvals, or denied listings.  
 
-## Why it belongs to Cybersecurity
-Security is at the core of our app. By implementing **MFA, admin verification, account status/role based control, and admin-approved listings**, we ensure that **user data and transactions are protected**. This prevents unauthorized access, fraud, and unverified content, making our platform safe for student users.
+Security is at the core of our app. By implementing **MFA, admin verification, account status/role based control, activity monitoring, brute-force attack prevention, and admin-approved listings**, we ensure that **user data and transactions are protected**. This prevents unauthorized access, fraud, unverified content, and malicious login attempts, making our platform safe for student users.
+
 
 
 ---
