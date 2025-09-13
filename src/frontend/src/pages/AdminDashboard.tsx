@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import api from '../services/api';
 import UserVer from './UserVer';
 import BookMod from './BookMod';
 import UserManagement from './UserManagement';
@@ -10,49 +11,58 @@ interface Stats {
   totalBooks: number;
 }
 
-interface Activity {
-  id: number;
-  user: string;
-  action: string;
-  time: string;
-}
-
 const AdminDashboard: React.FC = () => {
   const [stats, setStats] = useState<Stats>({
-    pendingVerifications: 12,
-    totalUsers: 245,
-    pendingBooks: 8,
-    totalBooks: 1523
+    pendingVerifications: 0,
+    totalUsers: 0,
+    pendingBooks: 0,
+    totalBooks: 0
   });
 
-  const [recentActivity] = useState<Activity[]>([
-    { id: 1, user: "Alice Johnson", action: "Account verified", time: "10 mins ago" },
-    { id: 2, user: "Bob Smith", action: "Book listing approved", time: "30 mins ago" },
-    { id: 3, user: "Charlie Brown", action: "Account registered", time: "1 hour ago" }
-  ]);
+  const [activeComponent, setActiveComponent] = useState<string>('dashboard');
 
- const [activeComponent, setActiveComponent] = useState<string>('dashboard');
- 
+  // ✅ Fetch stats from backend on load
+  const fetchStats = async () => {
+    try {
+      const res = await api.get('/api/admin/stats'); // make sure this route exists in backend
+      setStats(res.data);
+    } catch (err) {
+      console.error("❌ Failed to fetch stats:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  // ✅ When user is verified, update counts
+  const handleUserVerified = () => {
+    setStats(prev => ({
+      ...prev,
+      pendingVerifications: Math.max(prev.pendingVerifications - 1, 0),
+      totalUsers: prev.totalUsers + 1,
+    }));
+  };
 
   const renderComponent = () => {
-    switch(activeComponent) {
+    switch (activeComponent) {
       case 'verification':
-        return <UserVer />;
+        return <UserVer onVerified={handleUserVerified} />;
       case 'moderation':
-        return <BookMod/>;
+        return <BookMod />;
       case 'users':
         return <UserManagement />;
       default:
-        ///BOOTStrap
         return (
           <>
+            {/* Stats Cards */}
             <div className="row mb-4">
               <div className="col-md-3">
                 <div className="card bg-primary text-white">
                   <div className="card-body">
                     <h5 className="card-title">Pending Verifications</h5>
                     <h2 className="card-text">{stats.pendingVerifications}</h2>
-                    <button 
+                    <button
                       className="btn btn-light btn-sm"
                       onClick={() => setActiveComponent('verification')}
                     >
@@ -74,7 +84,7 @@ const AdminDashboard: React.FC = () => {
                   <div className="card-body">
                     <h5 className="card-title">Pending Books</h5>
                     <h2 className="card-text">{stats.pendingBooks}</h2>
-                    <button 
+                    <button
                       className="btn btn-dark btn-sm"
                       onClick={() => setActiveComponent('moderation')}
                     >
@@ -93,22 +103,27 @@ const AdminDashboard: React.FC = () => {
               </div>
             </div>
 
+            {/* Quick Actions */}
             <div className="row">
               <div className="col-md-8">
                 <div className="card">
                   <div className="card-header bg-dark text-white">
-                    <h5>Recent Activity</h5>
+                    <h5>Recent Activity (mock)</h5>
                   </div>
                   <div className="card-body">
                     <ul className="list-group">
-                      {recentActivity.map(activity => (
-                        <li key={activity.id} className="list-group-item d-flex justify-content-between align-items-center">
-                          <div>
-                            <strong>{activity.user}</strong> - {activity.action}
-                          </div>
-                          <span className="text-muted">{activity.time}</span>
-                        </li>
-                      ))}
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                          <strong>Alice Johnson</strong> - Account verified
+                        </div>
+                        <span className="text-muted">10 mins ago</span>
+                      </li>
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                          <strong>Bob Smith</strong> - Book listing approved
+                        </div>
+                        <span className="text-muted">30 mins ago</span>
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -119,19 +134,19 @@ const AdminDashboard: React.FC = () => {
                     <h5>Quick Actions</h5>
                   </div>
                   <div className="card-body">
-                    <button 
+                    <button
                       className="btn btn-primary w-100 mb-2"
                       onClick={() => setActiveComponent('verification')}
                     >
                       Verify Users
                     </button>
-                    <button 
+                    <button
                       className="btn btn-warning w-100 mb-2"
                       onClick={() => setActiveComponent('moderation')}
                     >
                       Moderate Books
                     </button>
-                    <button 
+                    <button
                       className="btn btn-info w-100 mb-2"
                       onClick={() => setActiveComponent('users')}
                     >
@@ -153,25 +168,25 @@ const AdminDashboard: React.FC = () => {
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h1>Admin Dashboard</h1>
             <div className="btn-group">
-              <button 
+              <button
                 className={`btn ${activeComponent === 'dashboard' ? 'btn-primary' : 'btn-outline-primary'}`}
                 onClick={() => setActiveComponent('dashboard')}
               >
                 Dashboard
               </button>
-              <button 
+              <button
                 className={`btn ${activeComponent === 'verification' ? 'btn-primary' : 'btn-outline-primary'}`}
                 onClick={() => setActiveComponent('verification')}
               >
                 Verification
               </button>
-              <button 
+              <button
                 className={`btn ${activeComponent === 'moderation' ? 'btn-primary' : 'btn-outline-primary'}`}
                 onClick={() => setActiveComponent('moderation')}
               >
                 Moderation
               </button>
-              <button 
+              <button
                 className={`btn ${activeComponent === 'users' ? 'btn-primary' : 'btn-outline-primary'}`}
                 onClick={() => setActiveComponent('users')}
               >
