@@ -39,7 +39,7 @@ const Login: React.FC = () => {
         localStorage.setItem("authToken", "demo-token");
         localStorage.setItem("role", "User");
         setMessage("✅ Login successful!");
-        window.location.href = "/confidential";
+        window.location.href = "/admin";
       } else {
         setMessage("❌ Invalid OTP");
       }
