@@ -1,9 +1,9 @@
-////UserMangenement
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import api from '../services/api';
 
 interface User {
-  id: number;
-  name: string;
+  _id: string;
+  fullName: string;
   email: string;
   status: 'active' | 'suspended' | 'inactive';
   role: 'student' | 'admin';
@@ -12,28 +12,47 @@ interface User {
 }
 
 const UserManagement: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([
-    { id: 1, name: 'Alice Johnson', email: 'alice@school.edu', status: 'active', role: 'student', joined: '2023-09-01', lastActive: '2023-10-20' },
-    { id: 2, name: 'Bob Smith', email: 'bob@school.edu', status: 'active', role: 'student', joined: '2023-09-05', lastActive: '2023-10-19' },
-    { id: 3, name: 'Charlie Brown', email: 'charlie@school.edu', status: 'suspended', role: 'student', joined: '2023-09-10', lastActive: '2023-10-15' },
-    { id: 4, name: 'Admin User', email: 'admin@school.edu', status: 'active', role: 'admin', joined: '2023-08-01', lastActive: '2023-10-20' },
-  ]);
-
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
-  const updateUserStatus = (id: number, status: 'active' | 'suspended' | 'inactive') => {
-    setUsers(users.map(user => 
-      user.id === id ? { ...user, status } : user
-    ));
+  // ✅ Fetch users from backend
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get('/api/admin/users'); // <-- make sure this route exists in backend
+      setUsers(res.data);
+    } catch (err) {
+      console.error("❌ Failed to fetch users:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const updateUserStatus = async (id: string, status: 'active' | 'suspended' | 'inactive') => {
+    try {
+      await api.patch(`/api/admin/users/${id}/status`, { status }); // backend should handle this
+      setUsers(users.map(user => 
+        user._id === id ? { ...user, status } : user
+      ));
+    } catch (err) {
+      console.error("❌ Failed to update user status:", err);
+    }
   };
 
   const filteredUsers = users.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const matchesSearch = user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  if (loading) return <p>Loading users...</p>;
 
   return (
     <div className="card">
@@ -42,6 +61,7 @@ const UserManagement: React.FC = () => {
         <p className="mb-0">Total Users: {users.length}</p>
       </div>
       <div className="card-body">
+        {/* Search + Filter */}
         <div className="row mb-4">
           <div className="col-md-6">
             <div className="input-group">
@@ -71,6 +91,7 @@ const UserManagement: React.FC = () => {
           </div>
         </div>
 
+        {/* Users Table */}
         <div className="table-responsive">
           <table className="table table-striped">
             <thead>
@@ -86,9 +107,9 @@ const UserManagement: React.FC = () => {
             </thead>
             <tbody>
               {filteredUsers.map(user => (
-                <tr key={user.id}>
+                <tr key={user._id}>
                   <td>
-                    {user.name}
+                    {user.fullName}
                     {user.role === 'admin' && <span className="badge bg-primary ms-1">Admin</span>}
                   </td>
                   <td>{user.email}</td>
@@ -114,14 +135,14 @@ const UserManagement: React.FC = () => {
                       </button>
                       <button 
                         className="btn btn-warning btn-sm"
-                        onClick={() => updateUserStatus(user.id, 'suspended')}
+                        onClick={() => updateUserStatus(user._id, 'suspended')}
                         disabled={user.status === 'suspended'}
                       >
                         <i className="bi bi-slash-circle me-1"></i> Suspend
                       </button>
                       <button 
                         className="btn btn-success btn-sm"
-                        onClick={() => updateUserStatus(user.id, 'active')}
+                        onClick={() => updateUserStatus(user._id, 'active')}
                         disabled={user.status === 'active'}
                       >
                         <i className="bi bi-check-circle me-1"></i> Activate
@@ -134,6 +155,7 @@ const UserManagement: React.FC = () => {
           </table>
         </div>
 
+        {/* Statistics */}
         <div className="mt-4">
           <h4>User Statistics</h4>
           <div className="row">

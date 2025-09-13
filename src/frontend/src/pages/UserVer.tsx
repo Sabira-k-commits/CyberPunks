@@ -1,111 +1,112 @@
+import React, { useEffect, useState } from 'react';
+import api from '../services/api';
 
-////UserVer
-
-import React, { useState } from 'react';
-
-interface Student {
-  id: number;
-  name: string;
+interface User {
+  _id: string;
+  fullName: string;
   email: string;
-  studentId: string;
-  status: 'pending' | 'verified' | 'rejected';
-  submittedAt: string;
+  studentNumber: string;
+  faculty: string;
+  course: string;
+  yearOfStudy: number;
 }
 
-const UserVer: React.FC = () => {
-  const [students, setStudents] = useState<Student[]>([
-    { id: 1, name: 'Alice Johnson', email: 'alice@school.edu', studentId: 'S12345', status: 'pending', submittedAt: '2023-10-15' },
-    { id: 2, name: 'Bob Smith', email: 'bob@school.edu', studentId: 'S12346', status: 'pending', submittedAt: '2023-10-16' },
-    { id: 3, name: 'Charlie Brown', email: 'charlie@school.edu', studentId: 'S12347', status: 'pending', submittedAt: '2023-10-16' },
-  ]);
+interface Props {
+  onVerified?: () => void;
+  onDenied?: () => void; // optional callback for denied users
+}
 
-  const [verificationNote, setVerificationNote] = useState<string>('');
+const UserVer: React.FC<Props> = ({ onVerified, onDenied }) => {
+  const [pendingUsers, setPendingUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const verifyStudent = (id: number, status: 'verified' | 'rejected') => {
-    setStudents(students.map(student => 
-      student.id === id ? { ...student, status } : student
-    ));
+  const fetchPendingUsers = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get('/api/admin/users/pending');
+      setPendingUsers(res.data);
+    } catch (err) {
+      console.error("❌ Failed to fetch pending users:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const pendingStudents = students.filter(student => student.status === 'pending');
+  const handleVerify = async (id: string) => {
+    try {
+      await api.patch(`/api/admin/verify/${id}`);
+      setPendingUsers(prev => prev.filter(u => u._id !== id));
+      onVerified?.(); // update dashboard stats
+    } catch (err) {
+      console.error("❌ Failed to verify user:", err);
+    }
+  };
+
+  const handleDeny = async (id: string) => {
+    try {
+      await api.patch(`/api/admin/users/${id}/deny`);
+      setPendingUsers(prev => prev.filter(u => u._id !== id));
+      onDenied?.(); // optional callback to update stats
+    } catch (err) {
+      console.error("❌ Failed to deny user:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchPendingUsers();
+  }, []);
+
+  if (loading) return <p>Loading...</p>;
 
   return (
     <div className="card">
       <div className="card-header bg-primary text-white">
-        <h2>Student Verification</h2>
-        <p className="mb-0">Pending Verifications: {pendingStudents.length}</p>
+        <h2>Pending Users: {pendingUsers.length}</h2>
       </div>
       <div className="card-body">
-        <div className="mb-3">
-          <label htmlFor="verificationNote" className="form-label">Verification Note (Optional)</label>
-          <textarea 
-            id="verificationNote"
-            className="form-control" 
-            rows={2}
-            value={verificationNote}
-            onChange={(e) => setVerificationNote(e.target.value)}
-            placeholder="Add notes about verification process..."
-          ></textarea>
-        </div>
-
-        {pendingStudents.length === 0 ? (
-          <div className="alert alert-success">
-            <i className="bi bi-check-circle-fill me-2"></i>
-            All students have been verified! Great job.
-          </div>
+        {pendingUsers.length === 0 ? (
+          <div className="alert alert-success">No pending users!</div>
         ) : (
-          <div className="table-responsive">
-            <table className="table table-striped">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Student ID</th>
-                  <th>Submitted</th>
-                  <th>Actions</th>
+          <table className="table table-striped">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Student Number</th>
+                <th>Faculty</th>
+                <th>Course</th>
+                <th>Year</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pendingUsers.map(u => (
+                <tr key={u._id}>
+                  <td>{u.fullName}</td>
+                  <td>{u.email}</td>
+                  <td>{u.studentNumber}</td>
+                  <td>{u.faculty}</td>
+                  <td>{u.course}</td>
+                  <td>{u.yearOfStudy}</td>
+                  <td>
+                    <button
+                      className="btn btn-success btn-sm me-2"
+                      onClick={() => handleVerify(u._id)}
+                    >
+                      Verify
+                    </button>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleDeny(u._id)}
+                    >
+                      Deny
+                    </button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {pendingStudents.map(student => (
-                  <tr key={student.id}>
-                    <td>{student.name}</td>
-                    <td>{student.email}</td>
-                    <td>
-                      <code>{student.studentId}</code>
-                    </td>
-                    <td>{student.submittedAt}</td>
-                    <td>
-                      <div className="btn-group">
-                        <button 
-                          className="btn btn-success btn-sm"
-                          onClick={() => verifyStudent(student.id, 'verified')}
-                        >
-                          <i className="bi bi-check-lg me-1"></i> Approve
-                        </button>
-                        <button 
-                          className="btn btn-danger btn-sm"
-                          onClick={() => verifyStudent(student.id, 'rejected')}
-                        >
-                          <i className="bi bi-x-lg me-1"></i> Reject
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         )}
-
-        <div className="mt-4">
-          <h4>Verification Guidelines</h4>
-          <ul className="list-group">
-            <li className="list-group-item">1. Check that the student ID matches the university format</li>
-            <li className="list-group-item">2. Verify email address ends with university domain</li>
-            <li className="list-group-item">3. Reject applications with obviously fake information</li>
-            <li className="list-group-item">4. When in doubt, contact the student for additional verification</li>
-          </ul>
-        </div>
       </div>
     </div>
   );

@@ -59,7 +59,7 @@ router.post('/register', registerUser);
  * @swagger
  * /api/auth/login-step1:
  *   post:
- *     summary: Login step 1 - email + password → sends OTP to email
+ *     summary: Login step 1 - email + password → sends OTP to email and returns temporary token
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -77,7 +77,16 @@ router.post('/register', registerUser);
  *                 type: string
  *     responses:
  *       200:
- *         description: OTP sent to email
+ *         description: OTP sent to email, returns temporary token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 tempToken:
+ *                   type: string
  *       400:
  *         description: Invalid email or password
  *       403:
@@ -89,8 +98,10 @@ router.post('/login-step1', loginUserStep1);
  * @swagger
  * /api/auth/login-step2:
  *   post:
- *     summary: Login step 2 - verify OTP → return JWT
+ *     summary: Login step 2 - verify OTP with temp token → return real JWT
  *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []   # Bearer <tempToken> in Authorization header
  *     requestBody:
  *       required: true
  *       content:
@@ -98,18 +109,30 @@ router.post('/login-step1', loginUserStep1);
  *           schema:
  *             type: object
  *             required:
- *               - email
  *               - otp
  *             properties:
- *               email:
- *                 type: string
  *               otp:
  *                 type: string
  *     responses:
  *       200:
  *         description: Logged in successfully, returns JWT
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                 fullName:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 token:
+ *                   type: string
  *       400:
  *         description: Invalid OTP or user not found
+ *       401:
+ *         description: Temp token missing, expired, or invalid
  */
 router.post('/login-step2', loginUserStep2);
 

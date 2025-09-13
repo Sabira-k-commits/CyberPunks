@@ -1,38 +1,48 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import api from "../services/api";
 
 const Register: React.FC = () => {
-  const [name, setName] = useState("");
-  const [surname, setSurname] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    studentNumber: "",
+    faculty: "",
+    course: "",
+    yearOfStudy: "",
+    phoneNumber: "",
+  });
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setMessage("");
 
-    if (!name || !surname || !email || !password || !confirmPassword) {
-      setMessage("All fields are required!");
-      return;
+    try {
+      const { data } = await api.post("/api/auth/register", formData);
+      setMessage("✅ Registration successful! Await admin approval.");
+      setFormData({
+        fullName: "",
+        email: "",
+        password: "",
+        studentNumber: "",
+        faculty: "",
+        course: "",
+        yearOfStudy: "",
+        phoneNumber: "",
+      });
+    } catch (err: any) {
+      setMessage(`❌ ${err.response?.data?.message || err.message}`);
+    } finally {
+      setLoading(false);
     }
-    if (!validateEmail(email)) {
-      setMessage("Please enter a valid email!");
-      return;
-    }
-    if (password !== confirmPassword) {
-      setMessage("Passwords do not match!");
-      return;
-    }
-
-    setMessage("✅ Registration successful! (local only, no API call)");
-    setName("");
-    setSurname("");
-    setEmail("");
-    setPassword("");
-    setConfirmPassword("");
   };
 
   return (
@@ -42,71 +52,33 @@ const Register: React.FC = () => {
           <div className="card shadow">
             <div className="card-body p-4">
               <h1 className="card-title text-center mb-4">Register</h1>
-              
+
               <form onSubmit={handleRegister}>
-                <div className="mb-3">
+                {Object.keys(formData).map((key) => (
                   <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Name"
-                    value={name}
-                    onChange={e => setName(e.target.value)}
+                    key={key}
+                    type={key === "password" ? "password" : "text"}
+                    name={key}
+                    className="form-control mb-3"
+                    placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
+                    value={formData[key as keyof typeof formData]}
+                    onChange={handleChange}
                   />
-                </div>
-                
-                <div className="mb-3">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Surname"
-                    value={surname}
-                    onChange={e => setSurname(e.target.value)}
-                  />
-                </div>
-                
-                <div className="mb-3">
-                  <input
-                    type="email"
-                    className="form-control"
-                    placeholder="University Email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                  />
-                </div>
-                
-                <div className="mb-3">
-                  <input
-                    type="password"
-                    className="form-control"
-                    placeholder="Password"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                  />
-                </div>
-                
-                <div className="mb-3">
-                  <input
-                    type="password"
-                    className="form-control"
-                    placeholder="Confirm Password"
-                    value={confirmPassword}
-                    onChange={e => setConfirmPassword(e.target.value)}
-                  />
-                </div>
-                
-                <button type="submit" className="btn btn-primary w-100 mb-3">
-                  Register
+                ))}
+
+                <button className="btn btn-primary w-100" disabled={loading}>
+                  {loading ? "Registering..." : "Register"}
                 </button>
               </form>
-              
+
               {message && (
-                <div className={`alert ${message.includes('✅') ? 'alert-success' : 'alert-danger'}`}>
+                <div className={`alert mt-3 ${message.includes("✅") ? "alert-success" : "alert-danger"}`}>
                   {message}
                 </div>
               )}
-              
-              <p className="text-center text-muted">
-                Already have an account? <Link to="/login" className="text-decoration-none">Login here</Link>
+
+              <p className="text-center text-muted mt-3">
+                Already have an account? <Link to="/login">Login here</Link>
               </p>
             </div>
           </div>
