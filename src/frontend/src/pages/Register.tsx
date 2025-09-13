@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-
 const Register: React.FC = () => {
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
@@ -37,47 +36,81 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="register-container">
-      <div className="register-card">
-        <h1>Register</h1>
-        <form onSubmit={handleRegister}>
-          <input
-            type="text"
-            placeholder="Name"
-            value={name}
-            onChange={e => setName(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Surname"
-            value={surname}
-            onChange={e => setSurname(e.target.value)}
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={e => setConfirmPassword(e.target.value)}
-          />
-          <br />
-          <button type="submit">Register</button>
-        </form>
-        {message && <p className="message-error">{message}</p>}
-        <p className="redirect-link">
-          Already have an account? <Link to="/login">Login here</Link>
-        </p>
+    <div className="container-fluid vh-100 d-flex align-items-center justify-content-center bg-light">
+      <div className="row w-100">
+        <div className="col-md-6 col-lg-4 mx-auto">
+          <div className="card shadow">
+            <div className="card-body p-4">
+              <h1 className="card-title text-center mb-4">Register</h1>
+              
+              <form onSubmit={handleRegister}>
+                <div className="mb-3">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Name"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                  />
+                </div>
+                
+                <div className="mb-3">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Surname"
+                    value={surname}
+                    onChange={e => setSurname(e.target.value)}
+                  />
+                </div>
+                
+                <div className="mb-3">
+                  <input
+                    type="email"
+                    className="form-control"
+                    placeholder="University Email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                  />
+                </div>
+                
+                <div className="mb-3">
+                  <input
+                    type="password"
+                    className="form-control"
+                    placeholder="Password"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                  />
+                </div>
+                
+                <div className="mb-3">
+                  <input
+                    type="password"
+                    className="form-control"
+                    placeholder="Confirm Password"
+                    value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)}
+                  />
+                </div>
+                
+                <button type="submit" className="btn btn-primary w-100 mb-3">
+                  Register
+                </button>
+              </form>
+              
+              {message && (
+                <div className={`alert ${message.includes('✅') ? 'alert-success' : 'alert-danger'}`}>
+                  {message}
+                </div>
+              )}
+              
+              <p className="text-center text-muted">
+                Already have an account? <Link to="/login" className="text-decoration-none">Login here</Link>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

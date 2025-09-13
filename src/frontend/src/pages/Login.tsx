@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,7 +19,6 @@ const Login: React.FC = () => {
 
     setLoading(true);
     setTimeout(() => {
-      // ✅ Fake success response
       setStep("otp");
       setMessage("OTP has been sent to your email (demo only)");
       setLoading(false);
@@ -37,13 +35,11 @@ const Login: React.FC = () => {
 
     setLoading(true);
     setTimeout(() => {
-      // ✅ Fake OTP check
       if (otp === "123456") {
         localStorage.setItem("authToken", "demo-token");
         localStorage.setItem("role", "User");
-
         setMessage("✅ Login successful!");
-        window.location.href = "/confidential"; // demo redirect
+        window.location.href = "/confidential";
       } else {
         setMessage("❌ Invalid OTP");
       }
@@ -52,74 +48,97 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <h1>Login</h1>
+    <div className="container-fluid vh-100 d-flex align-items-center justify-content-center bg-light">
+      <div className="row w-100">
+        <div className="col-md-6 col-lg-4 mx-auto">
+          <div className="card shadow">
+            <div className="card-body p-4">
+              <h1 className="card-title text-center mb-4">Login</h1>
 
-        {step === "login" && (
-          <form onSubmit={handleLogin}>
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <br />
-            <button type="submit" disabled={loading} className="login-btn">
-              {loading ? "Logging in..." : "Login"}
-            </button>
-          </form>
-        )}
+              {step === "login" && (
+                <form onSubmit={handleLogin}>
+                  <div className="mb-3">
+                    <input
+                      type="email"
+                      className="form-control"
+                      placeholder="University Email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="mb-3">
+                    <input
+                      type="password"
+                      className="form-control"
+                      placeholder="Password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                  
+                  <button 
+                    type="submit" 
+                    disabled={loading} 
+                    className="btn btn-primary w-100"
+                  >
+                    {loading ? "Logging in..." : "Login"}
+                  </button>
+                </form>
+              )}
 
-        {step === "otp" && (
-          <form onSubmit={handleVerifyOtp}>
-            <p>Enter the 6-digit code sent to your email</p>
-            <input
-              type="text"
-              placeholder="OTP (use 123456 for demo)"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-            />
-            <button type="submit" disabled={loading} className="verify-btn">
-              {loading ? "Verifying..." : "Verify OTP"}
-            </button>
-          </form>
-        )}
+              {step === "otp" && (
+                <form onSubmit={handleVerifyOtp}>
+                  <div className="alert alert-info">
+                    <small>Enter the 6-digit code sent to your email</small>
+                  </div>
+                  
+                  <div className="mb-3">
+                    <input
+                      type="text"
+                      className="form-control text-center"
+                      placeholder="Enter OTP (use 123456 for demo)"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      maxLength={6}
+                    />
+                  </div>
+                  
+                  <button 
+                    type="submit" 
+                    disabled={loading} 
+                    className="btn btn-success w-100"
+                  >
+                    {loading ? "Verifying..." : "Verify OTP"}
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={() => setStep("login")}
+                    className="btn btn-outline-secondary w-100 mt-2"
+                  >
+                    Back to Login
+                  </button>
+                </form>
+              )}
 
-        {message && (
-          <p
-            className={`mt-4 ${
-              step === "otp" ? "message-error" : "message-success"
-            }`}
-          >
-            {message}
-          </p>
-        )}
+              {message && (
+                <div className={`alert mt-3 ${
+                  message.includes('✅') ? 'alert-success' : 
+                  message.includes('sent') ? 'alert-info' : 'alert-danger'
+                }`}>
+                  {message}
+                </div>
+              )}
 
-        <p className="redirect-link">
-          {step === "login" ? (
-            <>
-              Don&apos;t have an account? <Link to="/register">Register here</Link>
-            </>
-          ) : (
-            <>
-              Back to{" "}
-              <button
-                type="button"
-                onClick={() => setStep("login")}
-                className="text-blue-500 font-bold"
-              >
-                Login
-              </button>
-            </>
-          )}
-        </p>
+              {step === "login" && (
+                <p className="text-center text-muted mt-3">
+                  Don't have an account? <Link to="/register" className="text-decoration-none">Register here</Link>
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
