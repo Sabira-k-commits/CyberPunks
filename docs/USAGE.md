@@ -38,7 +38,7 @@ npm start
 // TODO: Link your demo video and PowerPoint here
 ```
 Check out the Demos: 
-- [Demo Video](../demo/demo.mp4)
+- [Demo Video](../demo/demovideo.mp4)
 - [Demo Presentation](../demo/demo.pptx)
 
 ## 📌 Notes
