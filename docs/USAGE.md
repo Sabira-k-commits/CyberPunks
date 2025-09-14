@@ -11,14 +11,27 @@
 # Example
 npm start
 ```
+```c
+//to navigate to frontend directory
+```
+cd frontend
+```c
+//install dependencies
+```
+npm install
+
+```c
+//start the dev server
+```
+npm start
 
 ## 🖥️ How to Use
 ``` c
 // TODO: Provide step-by-step usage instructions for judges/users.
 ```
-1. Step 1 -> Do this
-2. Step 2 -> Then this
-3. Step 3 -> See the output/result
+1. Step 1 -> Run commands given above
+2. Step 2 -> Register with a new user or enter login credentials.
+3. Step 3 -> Explore the security features and have fun!
 
 ## 🎥 Demo
 ``` c
@@ -33,3 +46,8 @@ Check out the Demos:
 // TODO: Add any special instructions, caveats, or tips
 // for using your project.
 ```
+
+``` c
+//backend requirements
+```
+The frontend requires the backend server to be running on http://localhost:5000
