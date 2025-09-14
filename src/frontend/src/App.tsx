@@ -19,6 +19,11 @@ const App: React.FC = () => {
     <Route path="/admin/*" element={<AdminDashboard />} />
           <Route path="/login/AdminDashboard" element={<Navigate to="/admin" replace />} />
 
+          {/* student Dashboard*/}
+        {/* Student routes */}
+        <Route path="/student/*" element={<StudentDashboard />} />
+        <Route path="/login/StudentDashboard" element={<Navigate to="/student" replace />} />
+
     {/*/routing  for User verification*/}
      <Route path="/verify/*" element={<UserVer />} />
           <Route path="/AdminDashboard/UserVer" element={<Navigate to="/verify" replace />} />
