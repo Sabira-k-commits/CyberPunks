@@ -13,7 +13,7 @@ Three Musketeers
 ## 👥 Members
 | Name     | Role                | Institution           | Discord Handle | Email |
 |----------|---------------------|-----------------------| -------------------|-------------|
-| **Tebatso**   | Backend Developer/devOps/project Manager   | University of Pretoria|947885182336266250| <tebatsomahlathini@gmail.com> |
+| **Tebatso**   | Backend Developer/devOps/project Manager   | University of Pretoria|sophy21| <tebatsomahlathini@gmail.com> |
 | **Sabira**   | Frontent Developer  | University of Pretoria | originalcatlady16 | <sabira.k200416@gmail.com> |
 | **Langazelelwa**   | Presentation Planner     | University of Pretoria | langa.v8282 | <langavaks@gmail.com> |
 ``` c
