@@ -8,21 +8,26 @@
 ``` c
 // TODO: Fill-in the name of your team.
 ```
+CyberPunks
 
 ## 👥 Members
 | Name     | Role                | Institution           | Discord Handle | Email |
 |----------|---------------------|-----------------------| -------------------|-------------|
-| **Name 1**   | Backend Developer   | University of Cape Town | name1 | <email1@gmail.com> |
-| **Name 2**   | Frontend Developer  | University of the Witwatersrand | name2 | <email2@gmail.com> |
-| **Name 3**   | Designer            | University of Johannesburg | name3 | <email3@gmail.com> |
-| **Name 4**   | Q.A Tester          | University of the Western Cape | name4 | <email4@gmail.com> |
+| **Tebatso**   | Backend Developer   | University of Pretoria| name1 | <tebatsomahlathini@gmail.com> |
+| **Sabira**   | Frontend Developer  | University of Pretoria | originalcatlady16 | <sabira.k200416@gmail.com> |
+| **Langazelelwa**   | Researcher/Precentation Panner     | University of Pretoria | langa.v8282 | <langavaks@gmail.com> |
+``` c
+//| **Name 4**   | Q.A Tester          | University of the Western Cape | name4 | <email4@gmail.com> |
+```
+
 
 ## 🏫 Institution
 ``` c
 // TODO: Fill-in the name of the institution your
 // team is competing under.
 ```
+University Of Pretoria (UP)
 
 ## 📧 Other Contact Info
 - GitHub Repo: <https://github.com/user-name/repo-name>
-- Other Info (if available): LinkedIn, Website, etc.
+- Other Info (if available): [LinkedIn](https://www.linkedin.com/in/sabira-karie-666365378/), Website, etc.
