@@ -8,7 +8,7 @@
 ``` c
 // TODO: Fill-in the name of your team.
 ```
-CyberPunks
+Three Musketeers
 
 ## 👥 Members
 | Name     | Role                | Institution           | Discord Handle | Email |
