@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AdminDashboard from "./pages/AdminDashboard";
 import UserVer from "./pages/UserVer";
+import StudentDashboard from "./pages/UserDashboard";
 
 
 const App: React.FC = () => {
@@ -13,7 +14,7 @@ const App: React.FC = () => {
           <Route path="/" element={<Navigate to="/login" />} /> {/* Default to login */}
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} /> 
-
+          <Route path="/user-dashboard" element={<StudentDashboard />} />
       {/*/routing  for AdminDashboard*/}
 
     <Route path="/admin/*" element={<AdminDashboard />} />
@@ -23,6 +24,8 @@ const App: React.FC = () => {
      <Route path="/verify/*" element={<UserVer />} />
           <Route path="/AdminDashboard/UserVer" element={<Navigate to="/verify" replace />} />
         </Routes>
+
+
       </Router>
   );
 };

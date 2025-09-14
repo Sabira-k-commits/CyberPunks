@@ -1,5 +1,7 @@
 const User = require('../models/User');
 const sendEmail = require('../utils/sendEmail');
+const Activity = require('../models/Activity');
+const PhishingEmail = require('../models/PhishingEmail');
 
 const getAllUsers = async (req, res) => {
   try {
@@ -28,22 +30,27 @@ const getVerifiedUsers = async (req, res) => {
   }
 };
 
-const verifyStudent = async (req,res) => {
+
+
+const verifyStudent = async (req, res) => {
   const { userId } = req.params;
   const user = await User.findById(userId);
-  if (!user) return res.status(404).json({ message:'User not found' });
-  if (user.verified) return res.status(400).json({ message:'User already verified' });
+  if (!user) return res.status(404).json({ message: 'User not found' });
+  if (user.verified) return res.status(400).json({ message: 'User already verified' });
 
- user.verified = true;
+  user.verified = true;
   user.status = 'active';
   await user.save();
 
-  // Send verification email
-  await sendEmail(user.email, 'Account Verified', `Hi ${user.fullName}, your account is verified! You can now log in.`);
+  await Activity.create({ user: user.fullName, action: 'Account verified' });
+  await sendEmail(
+    user.email,
+    'Account Verified',
+    `Hi ${user.fullName}, your account is verified! Please log in and enable MFA to earn points.`
+  );
 
-  res.json({ message:'User verified and email sent' });
+  res.json({ message: 'User verified. MFA activation encouraged on first login.' });
 };
-
 
 
 const createAdmin = async (req, res) => {
@@ -98,21 +105,29 @@ const suspendUser = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
+    let actionMessage = '';
+
     // Update status and verified accordingly
     if (status === 'active') {
       user.status = 'active';
       user.verified = true;
+      actionMessage = 'Account activated';
     } else if (status === 'inactive') {
       user.status = 'inactive';
       user.verified = false;
+      actionMessage = 'Account set to inactive';
     } else if (status === 'suspended') {
       user.status = 'suspended';
       user.verified = false;
+      actionMessage = 'Account suspended';
     } else {
       return res.status(400).json({ message: 'Invalid status value' });
     }
 
     await user.save();
+
+    // Log activity
+    await Activity.create({ user: user.fullName, action: actionMessage });
 
     res.json({ message: `User status updated to ${status}`, user });
   } catch (err) {
@@ -120,9 +135,10 @@ const suspendUser = async (req, res) => {
   }
 };
 
+
 const getStats = async (req, res) => {
   try {
-    const totalUsers = await User.countDocuments({ role: 'student' });
+    const totalUsers = await User.countDocuments({ role: 'user' });
     const pendingVerifications = await User.countDocuments({ verified: false });
     res.json({ totalUsers, pendingVerifications });
   } catch (err) {
@@ -136,14 +152,14 @@ const denyUser = async (req, res) => {
   try {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
-
-    if (user.verified === true) {
-      return res.status(400).json({ message: 'Cannot deny a verified user' });
-    }
+    if (user.verified) return res.status(400).json({ message: 'Cannot deny a verified user' });
 
     user.status = 'suspended';
     user.verified = false;
     await user.save();
+
+    // Log activity
+    await Activity.create({ user: user.fullName, action: 'Account denied' });
 
     // Send denial email
     await sendEmail(
@@ -157,5 +173,28 @@ const denyUser = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+const getRecentActivity = async (req, res) => {
+  try {
+    const activities = await Activity.find()
+      .sort({ createdAt: -1 })
+      .limit(10); // last 10 actions
+    res.json(activities);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+const addPhishingEmail = async (req, res) => {
+  const { question, answer } = req.body;
+  if (!question || answer === undefined) {
+    return res.status(400).json({ message: "Question and answer required" });
+  }
 
-module.exports = { getAllUsers, verifyStudent, createAdmin,getPendingUsers, getVerifiedUsers, getStats, suspendUser, denyUser };
+  const email = await PhishingEmail.create({
+    question,
+    answer,
+    createdBy: req.user.id,
+  });
+
+  res.status(201).json({ message: "Phishing email added", email });
+};
+module.exports = { getAllUsers, verifyStudent, createAdmin,getPendingUsers, getVerifiedUsers, getStats, suspendUser, denyUser, getRecentActivity, addPhishingEmail };

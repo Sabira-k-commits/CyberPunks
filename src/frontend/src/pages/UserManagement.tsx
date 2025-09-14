@@ -6,9 +6,16 @@ interface User {
   fullName: string;
   email: string;
   status: 'active' | 'suspended' | 'inactive';
-  role: 'student' | 'admin';
+  role: 'user' | 'admin';
   joined: string;
   lastActive: string;
+}
+
+interface Activity {
+  _id: string;
+  user: string;
+  action: string;
+  createdAt: string;
 }
 
 const UserManagement: React.FC = () => {
@@ -17,11 +24,17 @@ const UserManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
-  // ✅ Fetch users from backend
+  // Activity modal
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [activityLoading, setActivityLoading] = useState<boolean>(false);
+
+  // Fetch users
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await api.get('/api/admin/users'); // <-- make sure this route exists in backend
+      const res = await api.get('/api/admin/users'); 
       setUsers(res.data);
     } catch (err) {
       console.error("❌ Failed to fetch users:", err);
@@ -34,20 +47,34 @@ const UserManagement: React.FC = () => {
     fetchUsers();
   }, []);
 
+  // Update status
   const updateUserStatus = async (id: string, status: 'active' | 'suspended' | 'inactive') => {
     try {
-      await api.patch(`/api/admin/users/${id}/status`, { status }); // backend should handle this
-      setUsers(users.map(user => 
-        user._id === id ? { ...user, status } : user
-      ));
+      await api.patch(`/api/admin/users/${id}/status`, { status });
+      setUsers(users.map(user => user._id === id ? { ...user, status } : user));
     } catch (err) {
       console.error("❌ Failed to update user status:", err);
     }
   };
 
+  // Fetch user activity
+  const fetchUserActivity = async (user: User) => {
+    setSelectedUser(user);
+    setActivityLoading(true);
+    setShowModal(true);
+    try {
+      const res = await api.get(`/api/admin/users/${user._id}/activity`); 
+      setActivities(res.data);
+    } catch (err) {
+      console.error("❌ Failed to fetch activity:", err);
+    } finally {
+      setActivityLoading(false);
+    }
+  };
+
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
+                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -108,44 +135,33 @@ const UserManagement: React.FC = () => {
             <tbody>
               {filteredUsers.map(user => (
                 <tr key={user._id}>
-                  <td>
-                    {user.fullName}
-                    {user.role === 'admin' && <span className="badge bg-primary ms-1">Admin</span>}
-                  </td>
+                  <td>{user.fullName}</td>
                   <td>{user.email}</td>
-                  <td>
-                    <span className={`badge ${user.role === 'admin' ? 'bg-primary' : 'bg-secondary'}`}>
-                      {user.role}
-                    </span>
-                  </td>
-                  <td>
-                    <span className={`badge ${
-                      user.status === 'active' ? 'bg-success' : 
-                      user.status === 'suspended' ? 'bg-danger' : 'bg-secondary'
-                    }`}>
-                      {user.status}
-                    </span>
-                  </td>
+                  <td>{user.role}</td>
+                  <td>{user.status}</td>
                   <td>{user.joined}</td>
                   <td>{user.lastActive}</td>
                   <td>
                     <div className="btn-group">
-                      <button className="btn btn-info btn-sm">
-                        <i className="bi bi-eye me-1"></i> View
+                      <button 
+                        className="btn btn-info btn-sm"
+                        onClick={() => fetchUserActivity(user)}
+                      >
+                        View
                       </button>
                       <button 
                         className="btn btn-warning btn-sm"
                         onClick={() => updateUserStatus(user._id, 'suspended')}
                         disabled={user.status === 'suspended'}
                       >
-                        <i className="bi bi-slash-circle me-1"></i> Suspend
+                        Suspend
                       </button>
                       <button 
                         className="btn btn-success btn-sm"
                         onClick={() => updateUserStatus(user._id, 'active')}
                         disabled={user.status === 'active'}
                       >
-                        <i className="bi bi-check-circle me-1"></i> Activate
+                        Activate
                       </button>
                     </div>
                   </td>
@@ -155,52 +171,38 @@ const UserManagement: React.FC = () => {
           </table>
         </div>
 
-        {/* Statistics */}
-        <div className="mt-4">
-          <h4>User Statistics</h4>
-          <div className="row">
-            <div className="col-md-3">
-              <div className="card bg-success text-white text-center">
-                <div className="card-body">
-                  <h5 className="card-title">Active Users</h5>
-                  <h3 className="card-text">
-                    {users.filter(u => u.status === 'active').length}
-                  </h3>
+        {/* Activity Modal */}
+        {showModal && selectedUser && (
+          <div className="modal fade show d-block" tabIndex={-1} role="dialog">
+            <div className="modal-dialog modal-dialog-scrollable">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">{selectedUser.fullName}'s Activity</h5>
+                  <button className="btn-close" onClick={() => setShowModal(false)}></button>
                 </div>
-              </div>
-            </div>
-            <div className="col-md-3">
-              <div className="card bg-danger text-white text-center">
-                <div className="card-body">
-                  <h5 className="card-title">Suspended Users</h5>
-                  <h3 className="card-text">
-                    {users.filter(u => u.status === 'suspended').length}
-                  </h3>
+                <div className="modal-body">
+                  {activityLoading ? (
+                    <p>Loading activity...</p>
+                  ) : activities.length === 0 ? (
+                    <p>No recent activity found.</p>
+                  ) : (
+                    <ul className="list-group">
+                      {activities.map(act => (
+                        <li key={act._id} className="list-group-item">
+                          <strong>{new Date(act.createdAt).toLocaleString()}:</strong> {act.action}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
-              </div>
-            </div>
-            <div className="col-md-3">
-              <div className="card bg-secondary text-white text-center">
-                <div className="card-body">
-                  <h5 className="card-title">Students</h5>
-                  <h3 className="card-text">
-                    {users.filter(u => u.role === 'student').length}
-                  </h3>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-3">
-              <div className="card bg-primary text-white text-center">
-                <div className="card-body">
-                  <h5 className="card-title">Admins</h5>
-                  <h3 className="card-text">
-                    {users.filter(u => u.role === 'admin').length}
-                  </h3>
+                <div className="modal-footer">
+                  <button className="btn btn-secondary" onClick={() => setShowModal(false)}>Close</button>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
+
       </div>
     </div>
   );

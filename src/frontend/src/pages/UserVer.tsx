@@ -5,10 +5,9 @@ interface User {
   _id: string;
   fullName: string;
   email: string;
-  studentNumber: string;
-  faculty: string;
-  course: string;
-  yearOfStudy: number;
+  role: string;
+  status: string;
+  points: number;
 }
 
 interface Props {
@@ -20,6 +19,7 @@ const UserVer: React.FC<Props> = ({ onVerified, onDenied }) => {
   const [pendingUsers, setPendingUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // Fetch pending users
   const fetchPendingUsers = async () => {
     setLoading(true);
     try {
@@ -32,21 +32,23 @@ const UserVer: React.FC<Props> = ({ onVerified, onDenied }) => {
     }
   };
 
+  // Verify a user
   const handleVerify = async (id: string) => {
     try {
       await api.patch(`/api/admin/verify/${id}`);
       setPendingUsers(prev => prev.filter(u => u._id !== id));
-      onVerified?.(); // update dashboard stats
+      onVerified?.(); // update dashboard stats if callback provided
     } catch (err) {
       console.error("❌ Failed to verify user:", err);
     }
   };
 
+  // Deny a user
   const handleDeny = async (id: string) => {
     try {
       await api.patch(`/api/admin/users/${id}/deny`);
       setPendingUsers(prev => prev.filter(u => u._id !== id));
-      onDenied?.(); // optional callback to update stats
+      onDenied?.();
     } catch (err) {
       console.error("❌ Failed to deny user:", err);
     }
@@ -56,7 +58,7 @@ const UserVer: React.FC<Props> = ({ onVerified, onDenied }) => {
     fetchPendingUsers();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p>Loading pending users...</p>;
 
   return (
     <div className="card">
@@ -72,10 +74,9 @@ const UserVer: React.FC<Props> = ({ onVerified, onDenied }) => {
               <tr>
                 <th>Name</th>
                 <th>Email</th>
-                <th>Student Number</th>
-                <th>Faculty</th>
-                <th>Course</th>
-                <th>Year</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Points</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -84,10 +85,9 @@ const UserVer: React.FC<Props> = ({ onVerified, onDenied }) => {
                 <tr key={u._id}>
                   <td>{u.fullName}</td>
                   <td>{u.email}</td>
-                  <td>{u.studentNumber}</td>
-                  <td>{u.faculty}</td>
-                  <td>{u.course}</td>
-                  <td>{u.yearOfStudy}</td>
+                  <td>{u.role}</td>
+                  <td>{u.status}</td>
+                  <td>{u.points}</td>
                   <td>
                     <button
                       className="btn btn-success btn-sm me-2"

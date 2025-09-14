@@ -7,11 +7,6 @@ const Register: React.FC = () => {
     fullName: "",
     email: "",
     password: "",
-    studentNumber: "",
-    faculty: "",
-    course: "",
-    yearOfStudy: "",
-    phoneNumber: "",
   });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -32,11 +27,7 @@ const Register: React.FC = () => {
         fullName: "",
         email: "",
         password: "",
-        studentNumber: "",
-        faculty: "",
-        course: "",
-        yearOfStudy: "",
-        phoneNumber: "",
+   
       });
     } catch (err: any) {
       setMessage(`❌ ${err.response?.data?.message || err.message}`);
