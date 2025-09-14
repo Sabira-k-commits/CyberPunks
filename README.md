@@ -1,21 +1,25 @@
-# Student Book Marketplace App
+# Begginer Cybersecurity Learning Platform
 
 ## Description
-Our app is a platform that allows students to **buy and sell textbooks safely and efficiently**. Students can list their used books for sale, browse available textbooks, and purchase them directly through the platform.
+Our app is a platform that teaches users how to stay safe online through interactive challenges, quizzes, and games. Verified users can access educational games such as phishing challenges, strong password challenges, and daily quizzes about technology and cybersecurity. The platform emphasizes user safety, engagement, and learning.
 
 ## Key Features
-- **Buy & Sell Books:** Students can list textbooks for sale or purchase books from others.  
-- **Admin Approval for Listings:** Any book a student wants to sell must first be approved by an admin before it becomes visible on the platform.  
-- **User Verification:** Admin approval is required before users can start buying or selling.  
-- **Multi-Factor Authentication (MFA):** Added security layer ensures that only authorized users can access their accounts.  
+
+### 1. Interactive Games
+- **Phishing Challenge:** Users learn to identify phishing attempts in a safe environment by spotting suspicious emails, links, and messages.  
+- **Strong Password Challenge:** Users test and improve their password strength by creating secure passwords and receiving immediate feedback.  
+- **Daily Quiz:** Short quizzes on cybersecurity and tech topics to reinforce learning.
+  
+### 2.  LeaderBoard
+- The **Leaderboard** displays the top users based on points earned from completing challenges, quizzes, and security-related actions.  
+- Users earn points by enabling **Multi-Factor Authentication (MFA)**, updating passwords, and completing learning activities.  
+- This system encourages users to improve their account security while engaging with the platform and competing with others for a higher rank on the leaderboard.
+  
+### 3. Admin Features
+- **Add and Manage Games:** Admins can create, update, and post phishing challenges, quizzes, and other learning activities.  
+- **User Verification:** Admin approval is required for new users before they can access games and quizzes.  
 - **Account Status Management:** Admins can set user accounts as active, inactive, or suspended to maintain platform integrity.  
-- **Activity Monitoring:** Admins can view detailed logs of user actions, including login times, logouts, and account changes, allowing for proper auditing and oversight.  
-- **Brute Force Protection:** The system uses **rate limiting** and login attempt tracking to prevent unauthorized access through repeated login attempts. Accounts are temporarily locked after multiple failed logins to mitigate brute-force attacks.  
-- **Email Notifications:** Users receive email updates about verification, account changes, approvals, or denied listings.  
-
-Security is at the core of our app. By implementing **MFA, admin verification, account status/role based control, activity monitoring, brute-force attack prevention, and admin-approved listings**, we ensure that **user data and transactions are protected**. This prevents unauthorized access, fraud, unverified content, and malicious login attempts, making our platform safe for student users.
-
-
+- **Activity Monitoring:** Admins can view detailed logs of user actions, including logins, logouts, completed challenges, and account changes for auditing purposes.
 
 ---
 
