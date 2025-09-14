@@ -1,4 +1,4 @@
-# Begginer Cybersecurity Learning Platform
+# Beginner Cybersecurity Learning Platform
 
 ## Description
 Our app is a platform that teaches users how to stay safe online through interactive challenges, quizzes, and games. Verified users can access educational games such as phishing challenges, strong password challenges, and daily quizzes about technology and cybersecurity. The platform emphasizes user safety, engagement, and learning.
