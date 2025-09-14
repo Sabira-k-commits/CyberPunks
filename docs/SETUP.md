@@ -1,35 +1,73 @@
-> *This document serves as a template for you to write **setup** instructions for your project.* 
-
-> Depending on the scale/complexity of your project, it may prove beneficial to have a **Python/Batch/Bash** script in the `scripts/` directory which *automatically sets-up* the project.
-
 # Setup Instructions
 
-Follow the steps below to set up and run the project. (Example)
+Follow the steps below to set up and run the project locally.
 
 ---
 
 ## 📦 Requirements
-``` c
-// TODO: List software, runtimes, frameworks, and or dependencies
-// along with instructions on how to set each up.
-```
-- Example: Node.js v18+
-- Example: Python 3.10
-- Example: Docker
+Make sure you have the following installed:
+
+- **Node.js** v18+  
+- **npm** or **yarn** (comes with Node.js)  
+- **MongoDB** (local or cloud e.g., MongoDB Atlas)  
+- **Git**  
+
 
 ---
 
 ## ⚙️ Installation
-``` bash
-# Clone the repository
-git clone <your-repo-url>
-cd <repo-name>
 
-# Install dependencies
-<insert command here>
-```
+### 1. Clone the repository
+```bash
+git clone https://github.com/Sabira-k-commits/CyberPunks.git
+cd CyberPunks
 
-## ▶️ Running the Project
-``` bash
-<insert run command here> # Or an explanation on what to do
-```
+
+### 2. Install dependencies
+## Backend (Express API)
+```bash
+cd src/backend
+npm install
+⚙️ Environment Setup
+
+Create a .env file in the server directory with the following values:
+
+PORT=5000
+MONGO_URI=mongodb://localhost:27017/cyberpunks-db
+JWT_SECRET=your_jwt_secret
+EMAIL_USER=your_email@example.com
+EMAIL_PASS=your_email_password
+SUPERADMIN_EMAIL=valid_email_for_admin
+SUPERADMIN_PASSWORD=strong_password 
+
+Replace MONGO_URI with your MongoDB URI if using MongoDB Atlas.
+
+Use an app password for EMAIL_PASS if using Gmail or other secure email providers.
+
+
+Frontend (React App)
+cd cd src/frontend
+npm install
+
+
+▶️ Running the Project
+Start Backend (Express API)
+cd src/backend
+npm run dev
+
+Start Frontend (React )
+cd src/frontend
+npm run dev
+
+
+This will start:
+
+Backend (Express API)
+
+Frontend (React App)
+
+MongoDB instance
+
+And craete an admin user 
+
+
