@@ -29,4 +29,12 @@ const adminOnly = (req, res, next) => {
   }
 };
 
-module.exports = { protect, adminOnly };
+const userOnly = (req, res, next) => {
+  if (req.user && req.user.role === 'user') {
+    next();
+  } else {
+    res.status(403).json({ message: 'User only route' });
+  }
+};
+
+module.exports = { protect, adminOnly, userOnly };

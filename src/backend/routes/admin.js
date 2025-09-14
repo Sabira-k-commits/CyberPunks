@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { createAdmin,getAllUsers, verifyStudent,getPendingUsers, getVerifiedUsers,denyUser ,getStats, suspendUser, } = require('../controllers/adminController');
+const { addPhishingEmail,getRecentActivity,createAdmin,getAllUsers, verifyStudent,getPendingUsers, getVerifiedUsers,denyUser ,getStats, suspendUser, } = require('../controllers/adminController');
 const { protect, adminOnly } = require('../middleware/authMiddleware');
 
 /**
@@ -199,5 +199,44 @@ router.patch('/users/:userId/status', protect, adminOnly, suspendUser);
  *         description: Admin only
  */
 router.patch('/users/:userId/deny', protect, adminOnly, denyUser);
+
+
+/**
+ * @swagger
+ * /api/admin/activity:
+ *   get:
+ *     summary: Get recent admin activity (Admin only)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of recent activity
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   user:
+ *                     type: string
+ *                   action:
+ *                     type: string
+ *                   createdAt:
+ *                     type: string
+ *                     format: date-time
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Admin only
+ */
+router.get('/activity', protect, adminOnly, getRecentActivity);
+
+
+// routes/admin.js (add route)
+router.post('/phishing', protect, adminOnly, addPhishingEmail);
 
 module.exports = router;

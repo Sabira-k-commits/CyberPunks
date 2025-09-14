@@ -1,19 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const { registerUser, loginUserStep1, loginUserStep2 } = require('../controllers/authController');
+const { enableMfa, registerUser, loginUserStep1, loginUserStep2 } = require('../controllers/authController');
+const { protect, adminOnly } = require('../middleware/authMiddleware');
 
 /**
  * @swagger
  * tags:
  *   name: Auth
- *   description: Authentication and registration endpoints
+ *   description: Authentication and registration endpoints for all users
  */
 
 /**
  * @swagger
  * /api/auth/register:
  *   post:
- *     summary: Register a new student
+ *     summary: Register a new user
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -25,27 +26,12 @@ const { registerUser, loginUserStep1, loginUserStep2 } = require('../controllers
  *               - fullName
  *               - email
  *               - password
- *               - studentNumber
- *               - faculty
- *               - course
- *               - yearOfStudy
- *               - phoneNumber
  *             properties:
  *               fullName:
  *                 type: string
  *               email:
  *                 type: string
  *               password:
- *                 type: string
- *               studentNumber:
- *                 type: string
- *               faculty:
- *                 type: string
- *               course:
- *                 type: string
- *               yearOfStudy:
- *                 type: string
- *               phoneNumber:
  *                 type: string
  *     responses:
  *       201:
@@ -59,7 +45,7 @@ router.post('/register', registerUser);
  * @swagger
  * /api/auth/login-step1:
  *   post:
- *     summary: Login step 1 - email + password → sends OTP to email and returns temporary token
+ *     summary: Login step 1 - email + password → sends OTP if MFA enabled and returns temporary token
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -77,7 +63,7 @@ router.post('/register', registerUser);
  *                 type: string
  *     responses:
  *       200:
- *         description: OTP sent to email, returns temporary token
+ *         description: OTP sent to email if MFA enabled, returns temporary token
  *         content:
  *           application/json:
  *             schema:
@@ -90,7 +76,7 @@ router.post('/register', registerUser);
  *       400:
  *         description: Invalid email or password
  *       403:
- *         description: Account not verified by admin
+ *         description: Account not verified or locked
  */
 router.post('/login-step1', loginUserStep1);
 
@@ -98,7 +84,7 @@ router.post('/login-step1', loginUserStep1);
  * @swagger
  * /api/auth/login-step2:
  *   post:
- *     summary: Login step 2 - verify OTP with temp token → return real JWT
+ *     summary: Login step 2 - verify OTP with temporary token → return real JWT
  *     tags: [Auth]
  *     security:
  *       - bearerAuth: []   # Bearer <tempToken> in Authorization header
@@ -127,6 +113,10 @@ router.post('/login-step1', loginUserStep1);
  *                   type: string
  *                 email:
  *                   type: string
+ *                 role:
+ *                   type: string
+ *                 status:
+ *                   type: string
  *                 token:
  *                   type: string
  *       400:
@@ -135,5 +125,32 @@ router.post('/login-step1', loginUserStep1);
  *         description: Temp token missing, expired, or invalid
  */
 router.post('/login-step2', loginUserStep2);
+
+/**
+ * @swagger
+ * /api/auth/enable-mfa:
+ *   post:
+ *     summary: Enable MFA for logged-in user and earn reward points
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: MFA enabled and points awarded
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 points:
+ *                   type: number
+ *       400:
+ *         description: MFA already enabled
+ *       404:
+ *         description: User not found
+ */
+router.post('/enable-mfa', protect, enableMfa);
 
 module.exports = router;

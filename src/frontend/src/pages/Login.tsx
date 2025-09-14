@@ -10,6 +10,7 @@ const Login: React.FC = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Step1: Password login
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) return setMessage("Please enter both email and password!");
@@ -18,9 +19,25 @@ const Login: React.FC = () => {
     setMessage("");
     try {
       const { data } = await api.post("/api/auth/login-step1", { email, password });
-      sessionStorage.setItem("tempToken", data.tempToken); // store temp token for step2
-      setStep("otp");
-      setMessage("OTP has been sent to your email");
+
+      // If MFA is enabled, backend returns { tempToken }
+      if (data.tempToken) {
+        sessionStorage.setItem("tempToken", data.tempToken);
+        setStep("otp");
+        setMessage("OTP has been sent to your email");
+      } else {
+        // MFA not enabled → directly log in
+        localStorage.setItem("authToken", data.token);
+        localStorage.setItem("role", data.role || "User");
+        setMessage("✅ Login successful!");
+        if (data.role === "admin") {
+          window.location.href = "/admin";
+        } else if (data.role === "user") {
+          window.location.href = "/user-dashboard";
+        } else {
+          window.location.href = "/";
+        }
+      }
     } catch (err: any) {
       setMessage(`❌ ${err.response?.data?.message || err.message}`);
     } finally {
@@ -28,6 +45,7 @@ const Login: React.FC = () => {
     }
   };
 
+  // Step2: Verify OTP
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!otp) return setMessage("Please enter the OTP");
@@ -47,13 +65,20 @@ const Login: React.FC = () => {
       const { data } = await api.post(
         "/api/auth/login-step2",
         { otp },
-        { headers: { Authorization: `Bearer ${tempToken}` } } // ✅ send temp token
+        { headers: { Authorization: `Bearer ${tempToken}` } }
       );
-      localStorage.setItem("authToken", data.token); // store final JWT
+      localStorage.setItem("authToken", data.token);
       localStorage.setItem("role", data.role || "User");
       sessionStorage.removeItem("tempToken");
       setMessage("✅ Login successful!");
-      window.location.href = "/admin";
+
+      if (data.role === "admin") {
+        window.location.href = "/admin";
+      } else if (data.role === "user") {
+        window.location.href = "/user-dashboard";
+      } else {
+        window.location.href = "/";
+      }
     } catch (err: any) {
       setMessage(`❌ ${err.response?.data?.message || err.message}`);
     } finally {
@@ -74,7 +99,7 @@ const Login: React.FC = () => {
                   <input
                     type="email"
                     className="form-control mb-3"
-                    placeholder="University Email"
+                    placeholder="User Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
