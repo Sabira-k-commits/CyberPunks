@@ -1,6 +1,21 @@
-# South African Intervarsity Hackathon Submission Template - 2025
+# Student Book Marketplace App
 
-Welcome to the official **Hackathon Submission Template** for the **South African Intervarsity Hackathon 2025**! This repository is designed to help participants organize their project submissions in a **consistent, judge-friendly structure** while supporting any tech stack.
+## Description
+Our app is a platform that allows students to **buy and sell textbooks safely and efficiently**. Students can list their used books for sale, browse available textbooks, and purchase them directly through the platform.
+
+## Key Features
+- **Buy & Sell Books:** Students can list textbooks for sale or purchase books from others.  
+- **Admin Approval for Listings:** Any book a student wants to sell must first be approved by an admin before it becomes visible on the platform.  
+- **User Verification:** Admin approval is required before users can start buying or selling.  
+- **Multi-Factor Authentication (MFA):** Added security layer ensures that only authorized users can access their accounts.  
+- **Account Status Management:** Admins can set user accounts as active, inactive, or suspended to maintain platform integrity.  
+- **Activity Monitoring:** Admins can view detailed logs of user actions, including login times, logouts, and account changes, allowing for proper auditing and oversight.  
+- **Brute Force Protection:** The system uses **rate limiting** and login attempt tracking to prevent unauthorized access through repeated login attempts. Accounts are temporarily locked after multiple failed logins to mitigate brute-force attacks.  
+- **Email Notifications:** Users receive email updates about verification, account changes, approvals, or denied listings.  
+
+Security is at the core of our app. By implementing **MFA, admin verification, account status/role based control, activity monitoring, brute-force attack prevention, and admin-approved listings**, we ensure that **user data and transactions are protected**. This prevents unauthorized access, fraud, unverified content, and malicious login attempts, making our platform safe for student users.
+
+
 
 ---
 

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import api from "../services/api";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -9,42 +10,55 @@ const Login: React.FC = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!email || !password) {
-      setMessage("Please enter both email and password!");
-      return;
-    }
+    if (!email || !password) return setMessage("Please enter both email and password!");
 
     setLoading(true);
-    setTimeout(() => {
+    setMessage("");
+    try {
+      const { data } = await api.post("/api/auth/login-step1", { email, password });
+      sessionStorage.setItem("tempToken", data.tempToken); // store temp token for step2
       setStep("otp");
-      setMessage("OTP has been sent to your email (demo only)");
+      setMessage("OTP has been sent to your email");
+    } catch (err: any) {
+      setMessage(`❌ ${err.response?.data?.message || err.message}`);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
-  const handleVerifyOtp = (e: React.FormEvent) => {
+  const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!otp) return setMessage("Please enter the OTP");
 
-    if (!otp) {
-      setMessage("Please enter the OTP");
+    setLoading(true);
+    setMessage("");
+
+    const tempToken = sessionStorage.getItem("tempToken");
+    if (!tempToken) {
+      setMessage("❌ Temp token missing. Please login again.");
+      setStep("login");
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
-    setTimeout(() => {
-      if (otp === "123456") {
-        localStorage.setItem("authToken", "demo-token");
-        localStorage.setItem("role", "User");
-        setMessage("✅ Login successful!");
-        window.location.href = "/confidential";
-      } else {
-        setMessage("❌ Invalid OTP");
-      }
+    try {
+      const { data } = await api.post(
+        "/api/auth/login-step2",
+        { otp },
+        { headers: { Authorization: `Bearer ${tempToken}` } } // ✅ send temp token
+      );
+      localStorage.setItem("authToken", data.token); // store final JWT
+      localStorage.setItem("role", data.role || "User");
+      sessionStorage.removeItem("tempToken");
+      setMessage("✅ Login successful!");
+      window.location.href = "/admin";
+    } catch (err: any) {
+      setMessage(`❌ ${err.response?.data?.message || err.message}`);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -57,31 +71,21 @@ const Login: React.FC = () => {
 
               {step === "login" && (
                 <form onSubmit={handleLogin}>
-                  <div className="mb-3">
-                    <input
-                      type="email"
-                      className="form-control"
-                      placeholder="University Email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </div>
-                  
-                  <div className="mb-3">
-                    <input
-                      type="password"
-                      className="form-control"
-                      placeholder="Password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                  </div>
-                  
-                  <button 
-                    type="submit" 
-                    disabled={loading} 
-                    className="btn btn-primary w-100"
-                  >
+                  <input
+                    type="email"
+                    className="form-control mb-3"
+                    placeholder="University Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                  <input
+                    type="password"
+                    className="form-control mb-3"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <button className="btn btn-primary w-100" disabled={loading}>
                     {loading ? "Logging in..." : "Login"}
                   </button>
                 </form>
@@ -92,26 +96,17 @@ const Login: React.FC = () => {
                   <div className="alert alert-info">
                     <small>Enter the 6-digit code sent to your email</small>
                   </div>
-                  
-                  <div className="mb-3">
-                    <input
-                      type="text"
-                      className="form-control text-center"
-                      placeholder="Enter OTP (use 123456 for demo)"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
-                      maxLength={6}
-                    />
-                  </div>
-                  
-                  <button 
-                    type="submit" 
-                    disabled={loading} 
-                    className="btn btn-success w-100"
-                  >
+                  <input
+                    type="text"
+                    className="form-control mb-3 text-center"
+                    placeholder="Enter OTP"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    maxLength={6}
+                  />
+                  <button className="btn btn-success w-100" disabled={loading}>
                     {loading ? "Verifying..." : "Verify OTP"}
                   </button>
-                  
                   <button
                     type="button"
                     onClick={() => setStep("login")}
@@ -123,17 +118,18 @@ const Login: React.FC = () => {
               )}
 
               {message && (
-                <div className={`alert mt-3 ${
-                  message.includes('✅') ? 'alert-success' : 
-                  message.includes('sent') ? 'alert-info' : 'alert-danger'
-                }`}>
+                <div
+                  className={`alert mt-3 ${
+                    message.includes("✅") ? "alert-success" : "alert-danger"
+                  }`}
+                >
                   {message}
                 </div>
               )}
 
               {step === "login" && (
                 <p className="text-center text-muted mt-3">
-                  Don't have an account? <Link to="/register" className="text-decoration-none">Register here</Link>
+                  Don't have an account? <Link to="/register">Register here</Link>
                 </p>
               )}
             </div>
