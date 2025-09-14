@@ -13,9 +13,9 @@ CyberPunks
 ## 👥 Members
 | Name     | Role                | Institution           | Discord Handle | Email |
 |----------|---------------------|-----------------------| -------------------|-------------|
-| **Tebatso**   | Backend Developer   | University of Pretoria| name1 | <tebatsomahlathini@gmail.com> |
-| **Sabira**   | Frontend Developer  | University of Pretoria | originalcatlady16 | <sabira.k200416@gmail.com> |
-| **Langazelelwa**   | Researcher/Presentation Planner     | University of Pretoria | langa.v8282 | <langavaks@gmail.com> |
+| **Tebatso**   | Backend Developer/devOps/project Manager   | University of Pretoria| name1 | <tebatsomahlathini@gmail.com> |
+| **Sabira**   | Frontent Developer  | University of Pretoria | originalcatlady16 | <sabira.k200416@gmail.com> |
+| **Langazelelwa**   | Presentation Planner     | University of Pretoria | langa.v8282 | <langavaks@gmail.com> |
 ``` c
 //| **Name 4**   | Q.A Tester          | University of the Western Cape | name4 | <email4@gmail.com> |
 ```
