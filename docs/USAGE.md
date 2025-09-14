@@ -39,7 +39,7 @@ npm start
 ```
 Check out the Demos: 
 - [Demo Video](../demo/demovideo.mp4)
-- [Demo Presentation](../demo/demo.pptx)
+- [Demo Presentation](../demo/HackPrac.pptx)
 
 ## 📌 Notes
 ``` c
